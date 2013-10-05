@@ -10,11 +10,23 @@ $(document).ready(function() {
                 console.log(data);
                 $.each(data, function(index, value){
                     $('#projects').append(
-                        "<h2>" + value.title + "</h2>"
+                        "<h3><a href='/build_gallery' class='build_gallery'>" + value.title + "</a></h3>"
                     );
                 });
+                $('#projects').show(400);
             }
         );
+    });
+
+    //Call the action to build the gallery
+    $('#projects a').on('click', function(event){
+        alert("Caught gallery build");
+        event.preventDefault();
+
+        //hide the projects div
+        $('#projects').hide();
+
+        //build the iframe
     });
 
 });
