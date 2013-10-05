@@ -1,17 +1,53 @@
-from flask import Flask
+from flask import Flask, render_template, jsonify, request, abort
+from behance_python.api import API
+import os
+import json
 
 app = Flask(__name__)
 
+#CONFIG
+api_key = os.environ.get('BEHANCE_API_KEY')
+
+
 @app.route('/')
 def index():
-    return "Hello world"
+    return render_template('index.html')
 
 ##############################
 #   Return a list of a users projects for them to select from
 ##############################
 @app.route('/get_projects')
 def get_projects():
-    pass
+    user_id = request.args.get('user_id')
+    app.logger.debug('user id is %s' % user_id)
+    if user_id:
+        if api_key:
+            behance = API(api_key)
+            user = behance.get_user(user_id) #What if invalid user?
+            projects = user.get_projects()
+            app.logger.debug('%s projects returned' % len(projects))
+            ret_data = []
+            for project in projects:
+                app.logger.debug('Cover is %s' % project.covers.values()[0])
+                if len(project.covers.values()) > 0:
+                    cover = project.covers.values()[0]
+                else:
+                    cover = None
+
+                d = {
+                    'id': project.id,
+                    'title': project.name,
+                    'cover': cover,
+                }
+                ret_data.append(d)
+            #return jsonify(ret_data)
+            return json.dumps(ret_data)
+        else:
+            app.logger.critical('No API key set!')
+            abort(400)
+    else:
+        abort(400)
+
 
 ##############################
 #   Build a gallery for a user based on the project they selected
@@ -30,4 +66,5 @@ def get_gallery(gallery_id):
 
 
 if __name__ == '__main__':
+    app.debug = True
     app.run()
