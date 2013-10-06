@@ -19,8 +19,7 @@ $(document).ready(function() {
     });
 
     //Call the action to build the gallery
-    $('#projects a').on('click', function(event){
-        alert("Caught gallery build");
+    $('#projects').on('click', 'a', function(event){
         event.preventDefault();
 
         //hide the projects div

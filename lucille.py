@@ -11,6 +11,7 @@ api_key = os.environ.get('BEHANCE_API_KEY')
 if api_key:
     behance = API(api_key)
 else:
+    print("Missing API key, exiting.")
     app.logger.critical('Unable to connect to Behance API--missing API key.')
     exit()
 
