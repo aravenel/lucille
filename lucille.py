@@ -1,5 +1,6 @@
-from flask import Flask, render_template, jsonify, request, abort
+from flask import Flask, render_template, request, abort
 from behance_python.api import API
+from sys import exit
 import os
 import json
 
@@ -7,6 +8,11 @@ app = Flask(__name__)
 
 #CONFIG
 api_key = os.environ.get('BEHANCE_API_KEY')
+if api_key:
+    behance = API(api_key)
+else:
+    app.logger.critical('Unable to connect to Behance API--missing API key.')
+    exit()
 
 
 @app.route('/')
@@ -22,7 +28,6 @@ def get_projects():
     app.logger.debug('user id is %s' % user_id)
     if user_id:
         if api_key:
-            behance = API(api_key)
             user = behance.get_user(user_id) #What if invalid user?
             projects = user.get_projects()
             app.logger.debug('%s projects returned' % len(projects))
